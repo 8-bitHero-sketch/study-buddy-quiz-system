@@ -1,0 +1,8 @@
+:root{--bg:#f7f8fb;--card:#fff;--accent:#2b6cb0}
+body{font-family:Segoe UI,Helvetica,Arial,sans-serif;background:var(--bg);margin:0;padding:24px}
+.container{max-width:760px;margin:0 auto;background:var(--card);padding:24px;border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,.06)}
+h1{margin-top:0}
+button{background:var(--accent);color:white;border:none;padding:8px 12px;border-radius:4px;cursor:pointer}
+.question{margin-bottom:18px;padding:10px;border-left:4px solid #eee}
+label{display:inline-block;margin:6px 0}
+#result{margin-top:12px;font-weight:600}
