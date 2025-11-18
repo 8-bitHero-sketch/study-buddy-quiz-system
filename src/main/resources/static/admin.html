@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Study Buddy - Admin</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <style>
+    :root{--accent:#7b2cbf;--accent2:#4cc9f0;--bg:#0f1720}
+    body{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}
+    .admin-card{max-width:900px;margin:48px auto;background:rgba(255,255,255,0.06);padding:20px;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,.25);position:relative}
+    .login{position:absolute;left:16px;top:12px;background:rgba(255,255,255,0.06);padding:8px 12px;border-radius:6px}
+    .admin-action{position:absolute;right:16px;bottom:12px;background:rgba(255,255,255,0.06);padding:8px 12px;border-radius:6px}
+    button.admin-btn{background:#fff;color:#111;padding:10px 14px;border-radius:8px;border:none;cursor:pointer}
+    .log-area{margin-top:18px;background:rgba(0,0,0,0.2);padding:12px;border-radius:8px;height:220px;overflow:auto;font-family:Consolas,monospace}
+  </style>
+  <script>
+    async function runImport() {
+      const out = document.getElementById('log');
+      out.textContent = 'Running import...\n';
+      try {
+        const r = await fetch('/api/admin/import-collections-quiz', { credentials: 'include' });
+        const text = await r.text();
+        out.textContent += text + '\n';
+        await fetchLogs();
+      } catch (e) {
+        out.textContent += 'Error: ' + e + '\n';
+      }
+    }
+
+    async function fetchLogs() {
+      try {
+        const r = await fetch('/api/admin/logs', { credentials: 'include' });
+        if (!r.ok) return;
+        const arr = await r.json();
+        const out = document.getElementById('log');
+        out.textContent = arr.join('\n');
+      } catch (e) {
+        // ignore
+      }
+    }
+
+    // Poll logs every 3 seconds
+    setInterval(fetchLogs, 3000);
+    window.addEventListener('load', fetchLogs);
+  </script>
+</head>
+<body>
+  <div class="admin-card">
+    <div class="login">Login: <strong>admin</strong></div>
+    <h1>Admin — Data Import</h1>
+    <p>Use this page to run server-side import tasks. This is a lightweight admin runner for development/demo only.</p>
+
+    <div style="display:flex;gap:12px;align-items:center">
+      <button class="admin-btn" onclick="runImport()">Import Collections Quiz</button>
+      <button class="admin-btn" onclick="location.href='/'">Go to Site</button>
+    </div>
+
+    <div class="log-area" id="log">Logs will appear here...</div>
+
+    <div class="admin-action">Admin</div>
+  </div>
+</body>
+</html>
