@@ -1,0 +1,127 @@
+{
+  "title": "Java Collections Basics",
+  "description": "A 15-question quiz covering Lists, Sets, Maps, common implementations, and basic API usage.",
+  "subject": "Collections",
+  "questions": [
+    {
+      "questionText": "Which Java collection allows duplicate elements and preserves insertion order?",
+      "optionA": "HashSet",
+      "optionB": "ArrayList",
+      "optionC": "HashMap",
+      "optionD": "TreeSet",
+      "correctAnswer": "B"
+    },
+    {
+      "questionText": "Which interface maps keys to values and does not allow duplicate keys?",
+      "optionA": "List",
+      "optionB": "Set",
+      "optionC": "Map",
+      "optionD": "Queue",
+      "correctAnswer": "C"
+    },
+    {
+      "questionText": "Which implementation provides constant-time performance for basic operations (add, remove, contains) on average and does not maintain order?",
+      "optionA": "LinkedList",
+      "optionB": "HashSet",
+      "optionC": "TreeMap",
+      "optionD": "ArrayDeque",
+      "correctAnswer": "B"
+    },
+    {
+      "questionText": "Which collection guarantees sorted order of its elements?",
+      "optionA": "HashSet",
+      "optionB": "LinkedHashSet",
+      "optionC": "TreeSet",
+      "optionD": "ArrayList",
+      "correctAnswer": "C"
+    },
+    {
+      "questionText": "Which List implementation is best when there are frequent insertions/removals at both ends?",
+      "optionA": "ArrayList",
+      "optionB": "LinkedList",
+      "optionC": "CopyOnWriteArrayList",
+      "optionD": "Vector",
+      "correctAnswer": "B"
+    },
+    {
+      "questionText": "When would you choose HashMap over TreeMap?",
+      "optionA": "When you need sorted keys",
+      "optionB": "When you need thread safety without external synchronization",
+      "optionC": "When you prefer faster average lookup time and don't need ordering",
+      "optionD": "When you need insertion order preserved",
+      "correctAnswer": "C"
+    },
+    {
+      "questionText": "Which collection would you use to maintain unique elements and also maintain insertion order?",
+      "optionA": "HashSet",
+      "optionB": "LinkedHashSet",
+      "optionC": "TreeSet",
+      "optionD": "ArrayList",
+      "correctAnswer": "B"
+    },
+    {
+      "questionText": "Choose the correct instantiation of an ArrayList of String:",
+      "optionA": "ArrayList<String> list = new ArrayList<>();",
+      "optionB": "List<String> list = new LinkedList<>();",
+      "optionC": "Set<String> list = new HashSet<>();",
+      "optionD": "Map<String,String> list = new HashMap<>();",
+      "correctAnswer": "A"
+    },
+    {
+      "questionText": "Choose the correct instantiation of a HashSet of StringBuilder:",
+      "optionA": "HashSet<StringBuilder> s = new HashSet<>();",
+      "optionB": "Set<StringBuilder> s = new ArrayList<>();",
+      "optionC": "List<StringBuilder> s = new HashSet<>();",
+      "optionD": "Map<StringBuilder,String> s = new HashMap<>();",
+      "correctAnswer": "A"
+    },
+    {
+      "questionText": "Choose the correct instantiation of a HashMap of String to String:",
+      "optionA": "HashMap<String,String> m = new HashMap<>();",
+      "optionB": "Map<String,String> m = new ArrayList<>();",
+      "optionC": "List<String,String> m = new HashMap<>();",
+      "optionD": "Set<String,String> m = new HashMap<>();",
+      "correctAnswer": "A"
+    },
+    {
+      "questionText": "Which method would you use to check whether a Map contains a particular key?",
+      "optionA": "map.containsKey(key)",
+      "optionB": "map.containsValue(key)",
+      "optionC": "map.hasKey(key)",
+      "optionD": "map.indexOf(key)",
+      "correctAnswer": "A"
+    },
+    {
+      "questionText": "Which method returns the number of elements in a Collection?",
+      "optionA": "size()",
+      "optionB": "length()",
+      "optionC": "count()",
+      "optionD": "getSize()",
+      "correctAnswer": "A"
+    },
+    {
+      "questionText": "If you need a thread-safe List where reads are frequent and writes are rare, which would you consider?",
+      "optionA": "ArrayList",
+      "optionB": "LinkedList",
+      "optionC": "CopyOnWriteArrayList",
+      "optionD": "Vector",
+      "correctAnswer": "C"
+    },
+    {
+      "questionText": "Which collection type would be most appropriate to implement a word-frequency table (word -> count)?",
+      "optionA": "List",
+      "optionB": "Set",
+      "optionC": "Map",
+      "optionD": "Queue",
+      "correctAnswer": "C"
+    },
+    {
+      "questionText": "Which of these collection operations is O(1) average time for HashMap?",
+      "optionA": "put/get",
+      "optionB": "sorting the keys",
+      "optionC": "iterate in sorted order",
+      "optionD": "finding nearest neighbor",
+      "correctAnswer": "A"
+    }
+  ]
+}
