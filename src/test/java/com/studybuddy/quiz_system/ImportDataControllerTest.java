@@ -40,4 +40,24 @@ public class ImportDataControllerTest {
             .andExpect(status().isOk())
             .andExpect(content().string(org.hamcrest.Matchers.containsString("already exists")));
     }
+
+    @Test
+    public void importArraysQuiz_runs_and_is_idempotent() throws Exception {
+        // First import should report success
+        mockMvc.perform(get("/api/admin/import-arrays-methods-quiz").with(org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic("admin","password")))
+            .andExpect(status().isOk())
+            .andExpect(content().string(org.hamcrest.Matchers.containsString("Imported")));
+
+        // Verify DB state - quiz created and 15 questions
+        var qOpt = quizRepository.findByTitle("Arrays and Methods Lab");
+        org.assertj.core.api.Assertions.assertThat(qOpt).isPresent();
+        var quiz = qOpt.get();
+        var questions = questionRepository.findByQuizId(quiz.getId());
+        org.assertj.core.api.Assertions.assertThat(questions).hasSize(15);
+
+        // Second import should indicate the quiz already exists
+        mockMvc.perform(get("/api/admin/import-arrays-methods-quiz").with(org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic("admin","password")))
+            .andExpect(status().isOk())
+            .andExpect(content().string(org.hamcrest.Matchers.containsString("already exists")));
+    }
 }
