@@ -17,6 +17,9 @@ public class ImportDataController {
     @Autowired
     private QuizManagementController quizManagementController;
 
+    @Autowired
+    private QuizRepository quizRepository;
+
     @GetMapping("/import-collections-quiz")
     public String importCollectionsQuiz() {
         try {
@@ -24,6 +27,14 @@ public class ImportDataController {
             InputStream is = res.getInputStream();
             ObjectMapper mapper = new ObjectMapper();
             QuizWithQuestionsRequest req = mapper.readValue(is, QuizWithQuestionsRequest.class);
+
+            // Idempotency: if a quiz with the same title already exists, do not create a duplicate
+            if (req.title != null) {
+                if (quizRepository.findByTitle(req.title).isPresent()) {
+                    return "Quiz already exists with title: " + req.title;
+                }
+            }
+
             quizManagementController.createQuizWithQuestions(req);
             return "Imported collections quiz";
         } catch (Exception e) {
