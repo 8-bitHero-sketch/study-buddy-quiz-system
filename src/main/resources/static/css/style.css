@@ -1,4 +1,11 @@
-:root{--bg:#f7f8fb;--card:#fff;--accent:#2b6cb0}
+body { font-family: Arial, Helvetica, sans-serif; background:#f7f7f7; color:#222; }
+.container { max-width: 800px; margin: 32px auto; background: #fff; padding: 20px; border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
+h1 { margin-top: 0; }
+.question { margin-bottom: 16px; padding: 8px; border-bottom: 1px solid #eee; }
+.resultItem { margin: 8px 0; padding: 8px; border-left: 4px solid #ddd; }
+.ok { color: green; font-weight: bold; }
+.bad { color: #c00; font-weight: bold; }
+a { color: #2a6; }:root{--bg:#f7f8fb;--card:#fff;--accent:#2b6cb0}
 body{font-family:Segoe UI,Helvetica,Arial,sans-serif;background:var(--bg);margin:0;padding:24px}
 .container{max-width:760px;margin:0 auto;background:var(--card);padding:24px;border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,.06)}
 h1{margin-top:0}
@@ -10,3 +17,39 @@ label{display:inline-block;margin:6px 0}
 .quiz-item a{color:var(--accent);text-decoration:none}
 .correct{color:green}
 .incorrect{color:#b00020}
+
+/* Banner and demo button styles */
+.banner { text-align: center; font-size: 1.4rem; padding: 12px 10px; margin-bottom: 14px; border-radius: 6px; color: #143; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+.demoButton { display: none; padding: 8px 12px; background: #2a8; color: #fff; border-radius: 6px; text-decoration: none; }
+.demoButton:hover { opacity: 0.95; }
+
+/* Results area styling */
+.resultsHeader { background: linear-gradient(90deg,#fffde7,#e6f7ff); padding:12px; border-radius:6px; margin-bottom:12px; box-shadow:0 2px 6px rgba(0,0,0,0.04); }
+.resultsList{margin-bottom:12px}
+.resultsActions{margin-top:12px}
+.tryAgainBtn{background:#2b6cb0;color:#fff;border-radius:6px;padding:10px 14px;border:none;cursor:pointer}
+
+/* Celebration overlay */
+#celebrationOverlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:0;transition:opacity .35s ease;z-index:9999}
+#celebrationOverlay.visible{opacity:1;pointer-events:auto}
+#celebrationOverlay .celebrationContent{position:relative;text-align:center;padding:28px;border-radius:12px;min-width:320px;max-width:720px;background:linear-gradient(135deg,#ffffffee,#f7fbff);box-shadow:0 10px 40px rgba(20,30,60,0.12)}
+.congrats{font-size:2rem;margin:8px 0;color:#164;letter-spacing:0.6px}
+.congratsSub{margin:0 0 12px 0;color:#3b6}
+
+/* Balloons */
+.balloons{position:absolute;top:-40px;left:0;right:0;height:0;pointer-events:none}
+.balloon{width:40px;height:56px;border-radius:50% 50% 50% 50%;position:absolute;bottom:0;opacity:0.95}
+.balloon.b1{left:20%;background:linear-gradient(180deg,#ff9a9e,#fecfef);animation:rise 4s ease-in infinite}
+.balloon.b2{left:45%;background:linear-gradient(180deg,#a1c4fd,#c2e9fb);animation:rise 4.6s ease-in .2s infinite}
+.balloon.b3{left:70%;background:linear-gradient(180deg,#fbc2eb,#a6c1ee);animation:rise 5s ease-in .4s infinite}
+.balloon:after{content:'';position:absolute;left:50%;bottom:-18px;width:2px;height:18px;background:rgba(0,0,0,0.1);transform:translateX(-50%)}
+@keyframes rise{0%{transform:translateY(60vh) rotate(-6deg);opacity:0}10%{opacity:1}100%{transform:translateY(-10vh) rotate(6deg);opacity:1}}
+
+/* Confetti simple dots */
+.fireworks{position:absolute;inset:0;pointer-events:none}
+.fireworks::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle at 20% 20%, rgba(255,205,86,.9) 0 3px, transparent 4px), radial-gradient(circle at 80% 30%, rgba(255,99,132,.9) 0 3px, transparent 4px), radial-gradient(circle at 60% 70%, rgba(102,204,255,.9) 0 3px, transparent 4px);background-repeat:no-repeat;animation:confetti 1.2s linear infinite}
+@keyframes confetti{0%{transform:translateY(-10px) scale(1)}50%{transform:translateY(20px) scale(1.02)}100%{transform:translateY(60px) scale(.98);opacity:0}}
+
+/* Slightly snazzy page background flare */
+body::before{content:'';position:fixed;left:-15vw;top:-10vh;width:60vw;height:60vh;background:radial-gradient(circle at 20% 20%, rgba(43,108,176,0.06),transparent 20%), radial-gradient(circle at 80% 80%, rgba(42,168,138,0.04),transparent 20%);pointer-events:none;z-index:0}
+.container{position:relative;z-index:1}
