@@ -1,4 +1,76 @@
 <!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Study Buddy - Quizzes</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="container">
+    <div id="banner" class="banner">Keep Testing Me!</div>
+    <h1>Available Quizzes</h1>
+    <ul id="quizzes"></ul>
+    <p><a id="startDemo" class="demoButton" href="#">Start 5-question demo</a></p>
+  </div>
+
+  <script>
+    fetch('/api/quizzes')
+      .then(r => r.json())
+      .then(list => {
+        const ul = document.getElementById('quizzes');
+        if (!Array.isArray(list) || list.length === 0) {
+          ul.innerHTML = '<li>No quizzes available.</li>';
+          return;
+        }
+        list.forEach(q => {
+          const li = document.createElement('li');
+          li.innerHTML = `<strong>${q.title}</strong> — ${q.description || ''} <a href="quiz.html?quizId=${q.id}">Start</a>`;
+          ul.appendChild(li);
+        });
+
+            // wire demo button to the seeded demo quiz if present
+            const demo = list.find(x => x.title && x.title.startsWith('Demo: Keep Testing Me'));
+            if (demo) {
+              const demoBtn = document.getElementById('startDemo');
+              demoBtn.href = `quiz.html?quizId=${demo.id}&demo=1`;
+              demoBtn.style.display = 'inline-block';
+
+              // auto-start demo after 2 minutes (120000ms) for testing
+              let countdown = 120; // seconds
+              const banner = document.getElementById('banner');
+              const info = document.createElement('div'); info.id='demoCountdown'; info.style.fontSize='0.9rem'; info.style.marginTop='8px';
+              banner.appendChild(info);
+              const tick = () => {
+                info.textContent = `Demo will auto-start in ${Math.ceil(countdown)}s`;
+                if (countdown <= 0) { window.location.href = demoBtn.href; return; }
+                countdown -= 1;
+                setTimeout(tick, 1000);
+              };
+              setTimeout(tick, 1000);
+            }
+      })
+      .catch(err => { document.getElementById('quizzes').innerHTML = '<li>Error loading quizzes</li>'; console.error(err); });
+
+    // Smooth RGB shifting for banner
+    (function() {
+      const banner = document.getElementById('banner');
+      if (!banner) return;
+      let t = 0;
+      function step() {
+        // gentle sine-based RGB cycling
+        const r = Math.round(200 + 30 * Math.sin(t * 0.02));
+        const g = Math.round(180 + 40 * Math.sin(t * 0.023 + 2));
+        const b = Math.round(210 + 25 * Math.sin(t * 0.017 + 4));
+        banner.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
+        t += 1;
+        requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    })();
+  </script>
+</body>
+</html>
+<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />

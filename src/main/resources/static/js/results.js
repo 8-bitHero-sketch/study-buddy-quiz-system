@@ -13,6 +13,10 @@ if (!res) {
   return;
 }
 
+const params = new URLSearchParams(location.search);
+const demoMode = params.get('demo') === '1';
+const phase = params.get('phase') || null;
+
 function render() {
   area.innerHTML = '';
   const header = document.createElement('div'); header.className='resultsHeader'; header.innerHTML = `<h2>Score: ${res.score} / ${res.total}</h2>`; area.appendChild(header);
@@ -33,8 +37,36 @@ function render() {
   // show animation depending on score
   if (res.score === res.total && res.total > 0) {
     showCelebration();
+    // if demo mode, after brief celebration, restart the cycle
+    if (demoMode) {
+      setTimeout(() => {
+        // short encouraging overlay then restart demo loop
+        showShortMessage('I believe in you ✨', 1400, () => {
+          // go back to quiz and run demo again
+          location.href = 'quiz.html?quizId=' + quizId + '&demo=1';
+        });
+      }, 2500);
+    }
   } else {
     showEncouragement();
+    // if demo mode and this page was reached as the wrong-phase, auto-submit correct answers after a pause
+    if (demoMode && phase === 'wrong') {
+      // wait 1.5s then fetch correct answers and post them
+      setTimeout(() => {
+        fetch(`/api/quizzes/${quizId}/answers`).then(r=>r.json()).then(keys => {
+          const answers = keys.map(k => ({ questionId: Number(k.questionId), answer: (k.correct || '').trim().toUpperCase() }));
+          // submit correct answers
+          fetch(`/api/quizzes/${quizId}/submit`, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ answers })
+          }).then(r=>r.json()).then(newRes => {
+            try { sessionStorage.setItem('quizResults-' + quizId, JSON.stringify(newRes)); } catch(e){}
+            res = newRes;
+            // re-render to show perfect result and celebration
+            render();
+          }).catch(e=>console.error('Auto-correct submit failed', e));
+        }).catch(e=>console.error('Failed to fetch answer keys', e));
+      }, 1500);
+    }
   }
 }
 

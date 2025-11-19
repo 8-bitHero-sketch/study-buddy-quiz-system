@@ -37,8 +37,34 @@ function loadQuiz() {
       // fetch quiz title
       fetch(`/api/quizzes/${quizId}`).then(r=>r.json()).then(q=> { qs('#quizTitle').textContent = q.title; });
       renderQuestions(questions);
+      // if demo mode, start automated wrong-answer submission after a short pause
+      const params = new URLSearchParams(location.search);
+      const demo = params.get('demo');
+      if (demo === '1') {
+        // wait a moment to let UI render
+        setTimeout(() => { runDemoWrong(questions); }, 800);
+      }
     })
     .catch(err => { qs('#quizForm').innerHTML = '<p>Failed to load quiz.</p>'; console.error(err); });
+}
+
+function runDemoWrong(questions) {
+  // build answers that are likely wrong: choose a random option for each question
+  const letters = ['A','B','C','D'];
+  const answers = questions.map(q => {
+    // pick random letter
+    const pick = letters[Math.floor(Math.random() * letters.length)];
+    return { questionId: Number(q.id), answer: pick };
+  });
+
+  // post to submit endpoint directly and then redirect to results with demo flag
+  fetch(`/api/quizzes/${quizId}/submit`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ answers })
+  }).then(r => r.json()).then(res => {
+    try { sessionStorage.setItem('quizResults-' + quizId, JSON.stringify(res)); } catch(e){}
+    // indicate phase wrong so results can branch
+    location.href = 'results.html?quizId=' + quizId + '&demo=1&phase=wrong';
+  }).catch(err => console.error('Demo submit failed', err));
 }
 
 function collectAnswers() {
