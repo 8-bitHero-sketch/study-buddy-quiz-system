@@ -22,7 +22,8 @@ function renderQuestions(questions) {
       if (opt == null) return;
       const id = `q_${q.id}_opt_${i}`;
       const label = document.createElement('label');
-      label.innerHTML = `<input type="radio" name="q${q.id}" value="${letters[i]}"> ${opt}`;
+      // prefix with letter like 'A.' and keep radio value as the letter
+      label.innerHTML = `<input type="radio" name="q${q.id}" value="${letters[i]}"> <strong>${letters[i]}.</strong> ${opt}`;
       div.appendChild(label);
       div.appendChild(document.createElement('br'));
     });

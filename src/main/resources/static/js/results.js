@@ -29,7 +29,9 @@ function render() {
   area.appendChild(list);
 
   const actions = document.createElement('div'); actions.className='resultsActions';
-  const tryBtn = document.createElement('button'); tryBtn.className='tryAgainBtn'; tryBtn.textContent='Try again';
+  const tryBtn = document.createElement('button');
+  tryBtn.className='tryAgainBtn resultsTryCenter';
+  tryBtn.textContent='Try again';
   tryBtn.addEventListener('click', onTryAgain);
   actions.appendChild(tryBtn);
   area.appendChild(actions);
@@ -95,6 +97,10 @@ function showCelebration(){
   ov.innerHTML = `<div class="celebrationContent"><div class="fireworks"></div><div class="balloons"><div class="balloon b1"></div><div class="balloon b2"></div><div class="balloon b3"></div></div><h1 class="congrats">Congratulations!</h1><p class="congratsSub">You scored a perfect 100% 🎉</p><button id="closeCelebration" class="tryAgainBtn">Close</button></div>`;
   document.body.appendChild(ov);
   qs('#closeCelebration').addEventListener('click', ()=>{ ov.remove(); });
+  // Also display percent big
+  const pct = Math.round((res.score / Math.max(1,res.total)) * 100);
+  const big = document.createElement('div'); big.className='celebrationPercent'; big.innerHTML = `<div style="font-size:48px;font-weight:900;color:#ffd24d">${pct}%</div>`;
+  ov.querySelector('.celebrationContent').appendChild(big);
 }
 
 function showEncouragement(){

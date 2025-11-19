@@ -1,5 +1,6 @@
-body { font-family: Arial, Helvetica, sans-serif; background:#f7f7f7; color:#222; }
-.container { max-width: 800px; margin: 32px auto; background: #fff; padding: 20px; border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
+/* Black & Gold theme base */
+body { font-family: Arial, Helvetica, sans-serif; background:#000; color:#e4d295; }
+.container { max-width: 800px; margin: 32px auto; background: linear-gradient(180deg,#0b0b0b,#0f0f0f); padding: 26px; border-radius: 10px; box-shadow: 0 6px 30px rgba(0,0,0,0.6); border: 1px solid rgba(229,203,138,0.08); }
 h1 { margin-top: 0; }
 .question { margin-bottom: 16px; padding: 8px; border-bottom: 1px solid #eee; }
 .resultItem { margin: 8px 0; padding: 8px; border-left: 4px solid #ddd; }
@@ -19,15 +20,24 @@ label{display:inline-block;margin:6px 0}
 .incorrect{color:#b00020}
 
 /* Banner and demo button styles */
-.banner { text-align: center; font-size: 1.4rem; padding: 12px 10px; margin-bottom: 14px; border-radius: 6px; color: #143; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
-.demoButton { display: none; padding: 8px 12px; background: #2a8; color: #fff; border-radius: 6px; text-decoration: none; }
+.banner { text-align: center; font-size: 1.6rem; padding: 14px 10px; margin-bottom: 14px; border-radius: 8px; color: #0b0b0b; box-shadow: 0 4px 18px rgba(0,0,0,0.5); background:linear-gradient(90deg,#f0c27b,#b8860b); transform: rotate(-1deg); font-weight:800; letter-spacing:1px }
+.demoButton { display: none; padding: 10px 14px; background: #c59f2c; color: #000; border-radius: 6px; text-decoration: none; font-weight:700 }
 .demoButton:hover { opacity: 0.95; }
 
+/* moving gold stripe background lines */
+.container::before{content:'';position:absolute;left:-50%;top:0;width:200%;height:100%;background-image:linear-gradient(90deg,transparent 0 10%, rgba(200,160,50,0.06) 10% 11%);background-size:200px 100%;transform:translateX(0);animation:moveStripe 12s linear infinite;pointer-events:none;z-index:0;border-radius:10px}
+@keyframes moveStripe{from{transform:translateX(-10%)}to{transform:translateX(10%)}}
+.container{position:relative;z-index:1}
+
 /* Results area styling */
-.resultsHeader { background: linear-gradient(90deg,#fffde7,#e6f7ff); padding:12px; border-radius:6px; margin-bottom:12px; box-shadow:0 2px 6px rgba(0,0,0,0.04); }
+.resultsHeader { background: linear-gradient(90deg,#111,#2b1f00); padding:16px; border-radius:8px; margin-bottom:12px; box-shadow:0 6px 18px rgba(0,0,0,0.4); color: #f6e7b1 }
 .resultsList{margin-bottom:12px}
 .resultsActions{margin-top:12px}
 .tryAgainBtn{background:#2b6cb0;color:#fff;border-radius:6px;padding:10px 14px;border:none;cursor:pointer}
+
+/* results page centered red blinking try again */
+.resultsTryCenter{display:block;margin:22px auto;padding:16px 24px;background:#b00;color:#fff;border-radius:10px;font-size:1.1rem;font-weight:800;animation:blink 1.6s ease-in-out infinite}
+@keyframes blink{0%{opacity:1}50%{opacity:0.4}100%{opacity:1}}
 
 /* Celebration overlay */
 #celebrationOverlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:0;transition:opacity .35s ease;z-index:9999}
@@ -35,6 +45,8 @@ label{display:inline-block;margin:6px 0}
 #celebrationOverlay .celebrationContent{position:relative;text-align:center;padding:28px;border-radius:12px;min-width:320px;max-width:720px;background:linear-gradient(135deg,#ffffffee,#f7fbff);box-shadow:0 10px 40px rgba(20,30,60,0.12)}
 .congrats{font-size:2rem;margin:8px 0;color:#164;letter-spacing:0.6px}
 .congratsSub{margin:0 0 12px 0;color:#3b6}
+/* celebration percent */
+.celebrationPercent{margin-top:8px}
 
 /* Balloons */
 .balloons{position:absolute;top:-40px;left:0;right:0;height:0;pointer-events:none}
