@@ -63,46 +63,12 @@ qs('#submitBtn').addEventListener('click', (e) => {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ answers })
   }).then(r => r.json()).then(res => {
-    const out = qs('#results');
-    out.innerHTML = '';
-    const header = document.createElement('div');
-    header.className = 'resultsHeader';
-    header.innerHTML = `<h2>Score: ${res.score} / ${res.total}</h2>`;
-    out.appendChild(header);
-
-    const list = document.createElement('div');
-    list.className = 'resultsList';
-    res.results.forEach(rq => {
-      const d = document.createElement('div');
-      d.className = 'resultItem';
-      d.innerHTML = `<p><b>${rq.question}</b><br>Your answer: ${rq.given || '(none)'} — ${rq.correct ? '<span class="ok">Correct</span>' : '<span class="bad">Wrong</span>'}<br>Correct answer: ${rq.correctAnswer || '(unknown)'} </p>`;
-      list.appendChild(d);
-    });
-    out.appendChild(list);
-
-    // Try again button
-    const actions = document.createElement('div');
-    actions.className = 'resultsActions';
-    const tryBtn = document.createElement('button');
-    tryBtn.textContent = 'Try again';
-    tryBtn.className = 'tryAgainBtn';
-    tryBtn.addEventListener('click', () => {
-      // reset form selections
-      qsa('input[type=radio]').forEach(i => i.checked = false);
-      out.innerHTML = '';
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-    actions.appendChild(tryBtn);
-    out.appendChild(actions);
-
-    // Celebration for perfect score
-    if (res.score === res.total && res.total > 0) {
-      showCelebration(out);
-    } else {
-      hideCelebration();
-    }
-
-    window.scrollTo(0, document.body.scrollHeight);
+    // Save results for the results page and redirect there
+    try {
+      sessionStorage.setItem('quizResults-' + quizId, JSON.stringify(res));
+    } catch (e) { console.warn('sessionStorage not available', e); }
+    // navigate to results view
+    location.href = 'results.html?quizId=' + quizId;
   }).catch(err => { console.error(err); alert('Submit failed'); });
 });
 
