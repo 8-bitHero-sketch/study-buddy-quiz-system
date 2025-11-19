@@ -55,6 +55,36 @@ Debug #4: Demo celebration and loop UX
 - Validation:
   - Manual POST and flow testing showed `showCelebration()` now appends the large percent and starts a runner animation; after animation finishes the page redirects to the start screen.
 
+Debug #5: Mental Wave Flow UX iteration — 2025-11-19
+- Observed: Requested immersive UX with quick demo start (30s), 3 attempts per question, fixed "Go to START" button, layered particle and sound celebration, debug overlay and console checkpoints.
+- Files changed:
+  - `src/main/resources/static/index.html` — demo countdown reduced to 30s
+  - `src/main/resources/static/quiz.html` — added `Go to START` button
+  - `src/main/resources/static/results.html` — added `Go to START` button
+  - `src/main/resources/static/css/style.css` — new styles for Mental Wave Flow: iridescent buttons, `goStart`, `debugToggle`, `celebrationCanvas`
+  - `src/main/resources/static/js/quiz.js` — added debug overlay toggle, console checkpoints, question-store mapping and per-question attempt tracking (3 attempts limit), safe Try Again restart
+  - `src/main/resources/static/js/results.js` — added particle canvas effects, layered bursts, simple WebAudio celebration sound, demo safety enforcement and results debug toggle
+
+- Fixes applied:
+  - Demo auto-start shortened from 120s to 30s.
+  - Enforced attempt limit (3 tries) per question; after limit a centrally placed "Try Again" restart button appears which clears attempts and reloads the quiz.
+  - Mapped server results to question IDs using stored question text to enable per-question attempt tracking.
+  - Added layered particle bursts and a lightweight celebratory sound (WebAudio) triggered on 100% results.
+  - Implemented a small runner animation and redirect loop for demo mode; retry counter reset on success.
+  - Added debug toggles on quiz and results pages which display a log buffer to help verify triggers.
+
+- Validation steps performed:
+  - Built and ran app locally, verified index loads, quiz loads, submission flows to results.
+  - Confirmed particle canvas is created and removed after celebration; sound attempted (browsers may require user gesture for audio in some environments).
+  - Verified that after 3 wrong attempts a Try Again button appears and reload clears attempts.
+
+- Notes / caveats:
+  - Mapping results to question IDs relies on matching the returned question text to the previously fetched question list; if questions are edited to have non-unique or slightly different text, mapping may fail. If desired, the backend can be updated to include `questionId` in `QuestionResult` to avoid text-matching.
+  - Browsers often block automatic audio playback until a user gesture occurs; the sound will play where allowed, otherwise the particle animation still runs.
+  - The debug overlay prints logs to a visible pane and the console for deeper debugging.
+
+End Debug #5
+
 Notes and recommended follow-ups
 - Add a small integration test exercising: GET questions -> POST submit (wrong) -> GET answers -> POST correct -> expect perfect score and redirection. This will prevent regressions in the demo flow.
 - Consider removing the legacy `/quizzes/{quizId}/submit-list` endpoint entirely if unused; keep codebase lean.

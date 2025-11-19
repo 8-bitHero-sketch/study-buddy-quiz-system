@@ -7,7 +7,27 @@ if (!quizId) {
   document.body.innerHTML = '<p>No quiz specified. Go back to <a href="/">quizzes</a>.</p>';
 }
 
+// runtime debug log buffer (displayable via debug overlay)
+const __debugLogs = [];
+function dbg(msg) { try { __debugLogs.push(msg); console.log('[QUIZ]',msg); } catch(e){} }
+
+function createDebugToggle() {
+  if (qs('#debugToggle')) return;
+  const btn = document.createElement('div'); btn.id='debugToggle'; btn.className='debugToggle'; btn.textContent='Debug';
+  btn.addEventListener('click', () => {
+    const ov = document.querySelector('.debugOverlay') || (()=>{
+      const d = document.createElement('div'); d.className='debugOverlay'; d.id='debugOverlay'; document.body.appendChild(d); return d; })();
+    if (ov.classList.contains('visible')) { ov.classList.remove('visible'); return; }
+    ov.innerHTML = '<pre style="white-space:pre-wrap">' + __debugLogs.join('\n') + '</pre>';
+    ov.classList.add('visible');
+  });
+  document.body.appendChild(btn);
+}
+
 function renderQuestions(questions) {
+  // store questions for mapping results to IDs
+  window.__questions = questions || [];
+  dbg('renderQuestions: loaded ' + window.__questions.length + ' questions');
   const form = qs('#quizForm');
   form.innerHTML = '';
   questions.forEach((q, idx) => {
@@ -38,6 +58,7 @@ function loadQuiz() {
       // fetch quiz title
       fetch(`/api/quizzes/${quizId}`).then(r=>r.json()).then(q=> { qs('#quizTitle').textContent = q.title; });
       renderQuestions(questions);
+      createDebugToggle();
       // if demo mode, start automated wrong-answer submission after a short pause
       const params = new URLSearchParams(location.search);
       const demo = params.get('demo');
@@ -94,6 +115,35 @@ qs('#submitBtn').addEventListener('click', (e) => {
     try {
       sessionStorage.setItem('quizResults-' + quizId, JSON.stringify(res));
     } catch (e) { console.warn('sessionStorage not available', e); }
+    dbg('Submitted answers: ' + JSON.stringify(answers));
+    dbg('Server response: ' + JSON.stringify(res));
+    // attempt tracking: map result entries back to question IDs using stored questions
+    try {
+      const qmap = (window.__questions || []).reduce((acc,q)=>{ acc[(q.text||q.questionText||'').trim()]=q.id; return acc; }, {});
+      (res.results||[]).forEach(rq => {
+        const keyText = (rq.question||'').trim();
+        const qid = qmap[keyText];
+        if (!qid) return;
+        const attemptKey = `attempts-${quizId}-${qid}`;
+        let attempts = Number(sessionStorage.getItem(attemptKey)||0);
+        if (!rq.correct) { attempts += 1; sessionStorage.setItem(attemptKey, String(attempts)); dbg(`Question ${qid} wrong, attempts=${attempts}`); }
+        else { sessionStorage.removeItem(attemptKey); dbg(`Question ${qid} correct, resetting attempts`); }
+        if (attempts >= 3) {
+          // disable inputs for that question and show Try Again to restart
+          const inputs = document.querySelectorAll(`input[name='q${qid}']`);
+          inputs.forEach(i=>i.disabled=true);
+          // create a central Try Again control
+          const retry = document.createElement('button'); retry.textContent='Try Again'; retry.className='resultsTryCenter'; retry.style.display='block'; retry.style.margin='20px auto';
+          retry.addEventListener('click', ()=>{ // restart quiz
+            // clear attempts and reload
+            (window.__questions||[]).forEach(q=> sessionStorage.removeItem(`attempts-${quizId}-${q.id}`));
+            location.href = `quiz.html?quizId=${quizId}`;
+          });
+          // avoid duplicate retry buttons
+          if (!document.querySelector('.container .resultsTryCenter')) document.querySelector('.container').appendChild(retry);
+        }
+      });
+    } catch(e){ dbg('Attempt tracking failed: '+e); }
     // navigate to results view
     location.href = 'results.html?quizId=' + quizId;
   }).catch(err => { console.error(err); alert('Submit failed'); });

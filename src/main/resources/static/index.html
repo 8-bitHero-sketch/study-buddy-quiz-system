@@ -35,8 +35,8 @@
               demoBtn.href = `quiz.html?quizId=${demo.id}&demo=1`;
               demoBtn.style.display = 'inline-block';
 
-              // auto-start demo after 2 minutes (120000ms) for testing
-              let countdown = 120; // seconds
+              // auto-start demo after 30 seconds for snappy demo
+              let countdown = 30; // seconds
               const banner = document.getElementById('banner');
               const info = document.createElement('div'); info.id='demoCountdown'; info.style.fontSize='0.9rem'; info.style.marginTop='8px';
               banner.appendChild(info);

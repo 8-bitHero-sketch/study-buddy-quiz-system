@@ -20,6 +20,77 @@ const phase = params.get('phase') || null;
 const autoCorrectRetryKey = 'demoAutoCorrectRetry-' + quizId;
 let autoCorrectRetries = Number(sessionStorage.getItem(autoCorrectRetryKey) || 0);
 
+// results page debug & effects utilities
+const __resLogs = [];
+function resDbg(msg){ try{ __resLogs.push(msg); console.log('[RESULTS]',msg);}catch(e){} }
+
+function createResultsDebugToggle(){
+  if (qs('#debugToggleR')) return;
+  const btn = document.createElement('div'); btn.id='debugToggleR'; btn.className='debugToggle'; btn.textContent='Debug';
+  btn.style.top = '64px';
+  btn.addEventListener('click', ()=>{
+    let ov = qs('#debugOverlayR');
+    if (!ov){ ov = document.createElement('div'); ov.id='debugOverlayR'; ov.className='debugOverlay'; document.body.appendChild(ov); }
+    if (ov.classList.contains('visible')){ ov.classList.remove('visible'); return; }
+    ov.innerHTML = '<pre style="white-space:pre-wrap">' + __resLogs.join('\n') + '</pre>';
+    ov.classList.add('visible');
+  });
+  document.body.appendChild(btn);
+}
+
+function createCelebrationCanvas(){
+  if (qs('#celebrationCanvas')) return qs('#celebrationCanvas');
+  const c = document.createElement('canvas'); c.id='celebrationCanvas'; document.body.appendChild(c);
+  function resize(){ c.width = window.innerWidth; c.height = window.innerHeight; }
+  resize(); window.addEventListener('resize', resize);
+  return c;
+}
+
+function launchParticles(durationMs){
+  const canvas = createCelebrationCanvas();
+  const ctx = canvas.getContext('2d');
+  const particles = [];
+  const colors = ['#ffd24d','#ff9a9e','#a1c4fd','#7ef0d5'];
+  function spawnBurst(x,y,count,spread,layer){
+    for(let i=0;i<count;i++){ const angle = Math.random()*Math.PI*2; const speed = Math.random()*spread + (layer*0.6);
+      particles.push({x,y, vx:Math.cos(angle)*speed, vy:Math.sin(angle)*speed - (1.2*layer), life:Math.random()*0.9+0.6, age:0, r: (2+Math.random()*6)*(1+layer*0.6), color: colors[Math.floor(Math.random()*colors.length)], opacity:1 - 0.25*layer}); }
+  }
+  // layered bursts
+  const cx = canvas.width/2, cy = canvas.height*0.55;
+  spawnBurst(cx, cy, 36, 4, 0);
+  spawnBurst(cx, cy, 22, 6, 1);
+  spawnBurst(cx, cy, 12, 10, 2);
+
+  let last = performance.now();
+  const ttl = durationMs || 2200;
+  const endAt = performance.now() + ttl;
+  function step(now){
+    const dt = Math.min(0.05, (now-last)/1000); last = now;
+    ctx.clearRect(0,0,canvas.width, canvas.height);
+    // trail layer: slightly translucent background to create trailing effect
+    ctx.fillStyle = 'rgba(0,0,0,0)'; ctx.fillRect(0,0,canvas.width, canvas.height);
+    for(let i=particles.length-1;i>=0;i--){ const p = particles[i]; p.age += dt; if(p.age > p.life){ particles.splice(i,1); continue; } p.vy += 80*dt; p.x += p.vx; p.y += p.vy*dt*60; const t = 1 - (p.age/p.life); ctx.beginPath(); ctx.fillStyle = `rgba(${hexToRgb(p.color)},${t*p.opacity})`; ctx.arc(p.x,p.y,p.r*t,0,Math.PI*2); ctx.fill(); }
+    if(now < endAt || particles.length>0){ requestAnimationFrame(step); } else { try{ canvas.remove(); }catch(e){} }
+  }
+  requestAnimationFrame(step);
+}
+
+function hexToRgb(hex){ const c = hex.replace('#',''); const num = parseInt(c,16); return `${(num>>16)&255},${(num>>8)&255},${num&255}`; }
+
+function playCelebrationSound(){
+  try{
+    const ac = new (window.AudioContext || window.webkitAudioContext)();
+    const now = ac.currentTime;
+    const g = ac.createGain(); g.connect(ac.destination); g.gain.setValueAtTime(0.0001, now);
+    g.gain.exponentialRampToValueAtTime(0.6, now+0.02);
+    g.gain.exponentialRampToValueAtTime(0.001, now+1.8);
+    // layered sine bursts
+    [0,3,7].forEach((m,i)=>{
+      const o = ac.createOscillator(); o.type='sine'; o.frequency.setValueAtTime(440*(1+0.08*i)*(1+0.02*m), now+0.01 + i*0.04); o.connect(g); o.start(now+0.01 + i*0.04); o.stop(now+0.8 + i*0.1);
+    });
+  }catch(e){ console.warn('Audio failed', e); }
+}
+
 function render() {
   area.innerHTML = '';
   const header = document.createElement('div'); header.className='resultsHeader'; header.innerHTML = `<h2>Score: ${res.score} / ${res.total}</h2>`; area.appendChild(header);
@@ -38,6 +109,7 @@ function render() {
   tryBtn.addEventListener('click', onTryAgain);
   actions.appendChild(tryBtn);
   area.appendChild(actions);
+  try{ createResultsDebugToggle(); resDbg('Rendered results, score='+res.score+' total='+res.total); }catch(e){}
 
   // show animation depending on score
   if (res.score === res.total && res.total > 0) {
@@ -119,6 +191,8 @@ function showCelebration(){
   const pct = Math.round((res.score / Math.max(1,res.total)) * 100);
   const big = document.createElement('div'); big.className='celebrationPercent'; big.innerHTML = `<div style="font-size:48px;font-weight:900;color:#ffd24d">${pct}%</div>`;
   ov.querySelector('.celebrationContent').appendChild(big);
+  // launch particle effects and sound
+  try { launchParticles(2400); playCelebrationSound(); } catch(e){ resDbg('Particles/sound failed: '+e); }
 
   // If demo mode, launch a runner element that moves from bottom -> top, then return to start page to loop demo
   if (demoMode) {
