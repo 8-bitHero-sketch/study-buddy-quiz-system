@@ -13,9 +13,12 @@ if (!res) {
   return;
 }
 
-const params = new URLSearchParams(location.search);
 const demoMode = params.get('demo') === '1';
 const phase = params.get('phase') || null;
+
+// demo safety: avoid infinite auto-correct loops by limiting retries
+const autoCorrectRetryKey = 'demoAutoCorrectRetry-' + quizId;
+let autoCorrectRetries = Number(sessionStorage.getItem(autoCorrectRetryKey) || 0);
 
 function render() {
   area.innerHTML = '';
@@ -53,8 +56,17 @@ function render() {
     showEncouragement();
     // if demo mode and this page was reached as the wrong-phase, auto-submit correct answers after a pause
     if (demoMode && phase === 'wrong') {
+      // safety: avoid infinite auto-correct loops
+      if (autoCorrectRetries >= 3) {
+        console.warn('Demo auto-correct retries exceeded, stopping demo loop.');
+        showShortMessage('Demo stopped after repeated retries', 2200, () => {});
+        return;
+      }
       // wait 1.5s then fetch correct answers and post them
       setTimeout(() => {
+        // increment and store retry count
+        autoCorrectRetries += 1;
+        try { sessionStorage.setItem(autoCorrectRetryKey, String(autoCorrectRetries)); } catch(e){}
         fetch(`/api/quizzes/${quizId}/answers`).then(r=>r.json()).then(keys => {
           const answers = keys.map(k => ({ questionId: Number(k.questionId), answer: (k.correct || '').trim().toUpperCase() }));
           // submit correct answers
@@ -65,8 +77,14 @@ function render() {
             res = newRes;
             // re-render to show perfect result and celebration
             render();
-          }).catch(e=>console.error('Auto-correct submit failed', e));
-        }).catch(e=>console.error('Failed to fetch answer keys', e));
+          }).catch(e=>{
+            console.error('Auto-correct submit failed', e);
+            showShortMessage('Auto-correct failed', 1600);
+          });
+        }).catch(e=>{
+          console.error('Failed to fetch answer keys', e);
+          showShortMessage('Failed to fetch answer keys', 1600);
+        });
       }, 1500);
     }
   }
@@ -101,6 +119,40 @@ function showCelebration(){
   const pct = Math.round((res.score / Math.max(1,res.total)) * 100);
   const big = document.createElement('div'); big.className='celebrationPercent'; big.innerHTML = `<div style="font-size:48px;font-weight:900;color:#ffd24d">${pct}%</div>`;
   ov.querySelector('.celebrationContent').appendChild(big);
+
+  // If demo mode, launch a runner element that moves from bottom -> top, then return to start page to loop demo
+  if (demoMode) {
+    try {
+      // reset retry counter on success
+      sessionStorage.removeItem(autoCorrectRetryKey);
+    } catch(e){}
+
+    const runner = document.createElement('div');
+    runner.id = 'celebrationRunner';
+    runner.style.position = 'fixed';
+    runner.style.left = '50%';
+    runner.style.bottom = '0px';
+    runner.style.transform = 'translateX(-50%)';
+    runner.style.width = '80px';
+    runner.style.height = '80px';
+    runner.style.borderRadius = '50%';
+    runner.style.background = 'radial-gradient(circle at 30% 30%, #ffd24d, #f39c12)';
+    runner.style.zIndex = 10000;
+    document.body.appendChild(runner);
+
+    // animate upward and then redirect to root to restart demo
+    const anim = runner.animate([
+      { transform: 'translate(-50%, 0vh) scale(1)' },
+      { transform: 'translate(-50%, -110vh) scale(1.1)' }
+    ], { duration: 2400, easing: 'cubic-bezier(.2,.8,.2,1)' });
+
+    anim.onfinish = () => {
+      try { ov.remove(); } catch(e){}
+      try { runner.remove(); } catch(e){}
+      // small delay so animation cleanup looks smooth
+      setTimeout(() => { location.href = '/'; }, 220);
+    };
+  }
 }
 
 function showEncouragement(){
