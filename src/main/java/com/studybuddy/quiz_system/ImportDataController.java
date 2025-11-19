@@ -58,6 +58,36 @@ public class ImportDataController {
         }
     }
 
+    @GetMapping("/import-arrays-methods-quiz")
+    public String importArraysMethodsQuiz() {
+        try {
+            ClassPathResource res = new ClassPathResource("data/arrays_methods_quiz.json");
+            InputStream is = res.getInputStream();
+            ObjectMapper mapper = new ObjectMapper();
+            QuizWithQuestionsRequest req = mapper.readValue(is, QuizWithQuestionsRequest.class);
+
+            log.info("Starting import for quiz title={}", req.title);
+            adminLogService.record("Starting import for quiz title=" + req.title);
+
+            if (req.title != null) {
+                if (quizRepository.findByTitle(req.title).isPresent()) {
+                    log.info("Import skipped - quiz already exists: {}", req.title);
+                    adminLogService.record("Import skipped - quiz already exists: " + req.title);
+                    return "Quiz already exists with title: " + req.title;
+                }
+            }
+
+            quizManagementController.createQuizWithQuestions(req);
+            log.info("Import completed for quiz title={}", req.title);
+            adminLogService.record("Import completed for quiz title=" + req.title);
+            return "Imported arrays & methods quiz";
+        } catch (Exception e) {
+            log.error("Import failed", e);
+            adminLogService.record("Import failed: " + e.getMessage());
+            return "Import failed: " + e.getMessage();
+        }
+    }
+
     @GetMapping("/logs")
     public Object getLogs() {
         return adminLogService.recent();

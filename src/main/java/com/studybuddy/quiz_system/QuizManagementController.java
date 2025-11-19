@@ -44,8 +44,8 @@ public class QuizManagementController {
         return saved;
     }
 
-    // Submit answers for a quiz and get score
-    @PostMapping("/quizzes/{quizId}/submit")
+    // Submit answers for a quiz and get score (alternate legacy endpoint)
+    @PostMapping("/quizzes/{quizId}/submit-list")
     public QuizResultDTO submitQuizAnswers(@PathVariable Long quizId, @RequestBody List<AnswerDTO> answers) {
         List<Question> questions = questionRepository.findByQuizId(quizId);
         Map<Long, Question> questionMap = new HashMap<>();

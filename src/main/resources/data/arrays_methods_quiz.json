@@ -1,0 +1,127 @@
+{
+  "title": "Arrays and Methods Lab",
+  "description": "15-question quiz based on Week 3 Arrays and Methods lab exercises.",
+  "subject": "Java Basics",
+  "questions": [
+    {
+      "questionText": "Given int[] arr = {1,5,2,8,13,6}; what is the first element?",
+      "optionA": "5",
+      "optionB": "1",
+      "optionC": "2",
+      "optionD": "13",
+      "correctAnswer": "B"
+    },
+    {
+      "questionText": "How do you access the last element of an array without knowing its length?",
+      "optionA": "array[array.length - 1]",
+      "optionB": "array[5]",
+      "optionC": "array[last()]",
+      "optionD": "array[-1]",
+      "correctAnswer": "A"
+    },
+    {
+      "questionText": "Accessing array index 6 on an array of length 6 causes which exception?",
+      "optionA": "NullPointerException",
+      "optionB": "ClassCastException",
+      "optionC": "ArrayIndexOutOfBoundsException",
+      "optionD": "IllegalArgumentException",
+      "correctAnswer": "C"
+    },
+    {
+      "questionText": "Which loop is a traditional indexed loop in Java?",
+      "optionA": "for (int i = 0; i < arr.length; i++)",
+      "optionB": "for (int x : arr)",
+      "optionC": "while (true)",
+      "optionD": "do {} while (false)",
+      "correctAnswer": "A"
+    },
+    {
+      "questionText": "Which loop is the enhanced for-each loop in Java?",
+      "optionA": "for (int i=0; i<arr.length; i++)",
+      "optionB": "for (int n : arr)",
+      "optionC": "while(arr.hasNext())",
+      "optionD": "for each (int n in arr)",
+      "correctAnswer": "B"
+    },
+    {
+      "questionText": "What is the sum of elements in {1,5,2,8,13,6}?",
+      "optionA": "35",
+      "optionB": "30",
+      "optionC": "25",
+      "optionD": "15",
+      "correctAnswer": "A"
+    },
+    {
+      "questionText": "What is the average of the array {1,5,2,8,13,6}? (rounded to 2 decimal places)",
+      "optionA": "5.83",
+      "optionB": "4.50",
+      "optionC": "5.00",
+      "optionD": "3.50",
+      "correctAnswer": "A"
+    },
+    {
+      "questionText": "Which numbers in the array are odd?",
+      "optionA": "1,5,13",
+      "optionB": "2,6",
+      "optionC": "8,2",
+      "optionD": "5,6",
+      "correctAnswer": "A"
+    },
+    {
+      "questionText": "Given names = {\"Sam\", \"Sally\", \"Thomas\", \"Robert\"}, what is the total letter count?",
+      "optionA": "20",
+      "optionB": "18",
+      "optionC": "19",
+      "optionD": "21",
+      "correctAnswer": "A"
+    },
+    {
+      "questionText": "Which method signature prints a greeting and returns nothing?",
+      "optionA": "public static String printGreeting(String name)",
+      "optionB": "public static void printGreeting(String name)",
+      "optionC": "public String getGreeting(String name)",
+      "optionD": "public static int printGreeting(String name)",
+      "correctAnswer": "B"
+    },
+    {
+      "questionText": "Which method returns a greeting String without printing?",
+      "optionA": "getGreeting",
+      "optionB": "printGreeting",
+      "optionC": "sayHello",
+      "optionD": "showGreeting",
+      "correctAnswer": "A"
+    },
+    {
+      "questionText": "What does hasMoreLetters(\"Hello\", 3) return?",
+      "optionA": "false",
+      "optionB": "true",
+      "optionC": "null",
+      "optionD": "throws exception",
+      "correctAnswer": "B"
+    },
+    {
+      "questionText": "Which method checks if a string exists in a String[] array?",
+      "optionA": "stringExists(array, value)",
+      "optionB": "contains(array, value)",
+      "optionC": "indexOf(array, value)",
+      "optionD": "hasValue(array, value)",
+      "correctAnswer": "A"
+    },
+    {
+      "questionText": "What does findSmallest(new int[]{1,5,2,8,13,6}) return?",
+      "optionA": "1",
+      "optionB": "2",
+      "optionC": "5",
+      "optionD": "0",
+      "correctAnswer": "A"
+    },
+    {
+      "questionText": "Which of these is a palindrome when ignoring spaces and case?",
+      "optionA": "hello",
+      "optionB": "racecar",
+      "optionC": "java",
+      "optionD": "world",
+      "correctAnswer": "B"
+    }
+  ]
+}

@@ -1,18 +1,73 @@
 <!doctype html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8">
   <title>Study Buddy - Quizzes</title>
-  <link rel="stylesheet" href="/css/style.css" />
-  <script defer src="/js/app.js"></script>
+  <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-  <main class="container">
-    <h1>Study Buddy — Quizzes</h1>
-    <p>Choose a quiz to begin.</p>
+  <div class="container">
+    <div id="banner" class="banner">Keep Testing Me!</div>
+    <h1>Available Quizzes</h1>
     <ul id="quizzes"></ul>
-    <p style="margin-top:16px"><a href="/quiz.html">Or open the quiz player</a></p>
-  </main>
+    <p><a id="startDemo" class="demoButton" href="#">Start 5-question demo</a></p>
+  </div>
+
+  <script>
+    fetch('/api/quizzes')
+      .then(r => r.json())
+      .then(list => {
+        const ul = document.getElementById('quizzes');
+        if (!Array.isArray(list) || list.length === 0) {
+          ul.innerHTML = '<li>No quizzes available.</li>';
+          return;
+        }
+        list.forEach(q => {
+          const li = document.createElement('li');
+          li.innerHTML = `<strong>${q.title}</strong> — ${q.description || ''} <a href="quiz.html?quizId=${q.id}">Start</a>`;
+          ul.appendChild(li);
+        });
+
+            // wire demo button to the seeded demo quiz if present
+            const demo = list.find(x => x.title && x.title.startsWith('Demo: Keep Testing Me'));
+            if (demo) {
+              const demoBtn = document.getElementById('startDemo');
+              demoBtn.href = `quiz.html?quizId=${demo.id}&demo=1`;
+              demoBtn.style.display = 'inline-block';
+
+              // auto-start demo after 30 seconds for snappy demo
+              let countdown = 30; // seconds
+              const banner = document.getElementById('banner');
+              const info = document.createElement('div'); info.id='demoCountdown'; info.style.fontSize='0.9rem'; info.style.marginTop='8px';
+              banner.appendChild(info);
+              const tick = () => {
+                info.textContent = `Demo will auto-start in ${Math.ceil(countdown)}s`;
+                if (countdown <= 0) { window.location.href = demoBtn.href; return; }
+                countdown -= 1;
+                setTimeout(tick, 1000);
+              };
+              setTimeout(tick, 1000);
+            }
+      })
+      .catch(err => { document.getElementById('quizzes').innerHTML = '<li>Error loading quizzes</li>'; console.error(err); });
+
+    // Smooth RGB shifting for banner
+    (function() {
+      const banner = document.getElementById('banner');
+      if (!banner) return;
+      let t = 0;
+      function step() {
+        // gentle sine-based RGB cycling
+        const r = Math.round(200 + 30 * Math.sin(t * 0.02));
+        const g = Math.round(180 + 40 * Math.sin(t * 0.023 + 2));
+        const b = Math.round(210 + 25 * Math.sin(t * 0.017 + 4));
+        banner.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
+        t += 1;
+        requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    })();
+  </script>
 </body>
 </html>
+
