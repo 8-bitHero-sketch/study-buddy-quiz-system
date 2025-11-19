@@ -91,3 +91,15 @@ Notes and recommended follow-ups
 - Keep `Log Reports.md` updated for each debug session; the repository now contains this file at root.
 
 End of log (most recent entries first).
+
+Debug #6: Require answers on submit, clear selections when wrong, celebrate only on perfect
+- Date: 2025-11-19
+- Observed: Users could submit with unanswered questions; animation timing could be lost when immediately navigating away after a perfect submit. Also UX would be confusing when wrong answers remained selected after a failed submit.
+- Fix applied:
+  - Updated `src/main/resources/static/js/quiz.js` to block submit unless every question has a selected answer; shows a short transient message when blocked.
+  - When server reports a perfect score, the quiz page now runs `showCelebration()` locally and delays navigation to `results.html` so the fireworks and runner animation are visible.
+  - When the submitted answers are not all correct, the UI clears all selected radio buttons and shows a "Some answers were incorrect — try again" short message to encourage retry.
+  - Added a small `showShortMessage()` helper overlay used for validation and brief notices.
+- Validation: Rebuilt jar, restarted server, and tested submit flows locally (perfect -> celebration -> results; wrong -> cleared selections + results). Logged and verified behavior in browser.
+
+End Debug #6

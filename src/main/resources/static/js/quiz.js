@@ -106,6 +106,14 @@ function collectAnswers() {
 qs('#submitBtn').addEventListener('click', (e) => {
   e.preventDefault();
   const answers = collectAnswers();
+  // require an answer for each question before submitting
+  const expected = (window.__questions || []).length;
+  if (answers.length < expected) {
+    showShortMessage('Please answer all questions before submitting', 1600);
+    dbg(`Submit blocked: answered ${answers.length}/${expected}`);
+    return;
+  }
+
   fetch(`/api/quizzes/${quizId}/submit`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -144,7 +152,27 @@ qs('#submitBtn').addEventListener('click', (e) => {
         }
       });
     } catch(e){ dbg('Attempt tracking failed: '+e); }
-    // navigate to results view
+    // If everything is correct, show celebration here first to avoid
+    // animation timing issues when immediately navigating away.
+    if (res && typeof res.score === 'number' && res.score === res.total && res.total > 0) {
+      try { sessionStorage.setItem('quizResults-' + quizId, JSON.stringify(res)); } catch(e){}
+      showCelebration();
+      // after celebration, go to results to show detailed breakdown
+      setTimeout(() => { location.href = 'results.html?quizId=' + quizId; }, 2400);
+      return;
+    }
+
+    // If not all correct, prompt Try Again and clear radio selections so
+    // the user can retry cleanly
+    const anyWrong = !(res && typeof res.score === 'number' && res.score === res.total);
+    if (anyWrong) {
+      showShortMessage('Some answers were incorrect — try again', 1400);
+      // clear all selected radios so user must pick again
+      qsa('input[type=radio][name^="q"]').forEach(i=>{ try { i.checked = false; } catch(e){} });
+      dbg('Cleared radio selections after wrong submit');
+    }
+
+    // navigate to results view (shows breakdown and Try Again control)
     location.href = 'results.html?quizId=' + quizId;
   }).catch(err => { console.error(err); alert('Submit failed'); });
 });
@@ -183,4 +211,15 @@ function hideCelebration() {
   if (!ov) return;
   ov.classList.remove('visible');
   setTimeout(() => { ov.remove(); }, 900);
+}
+
+// Small transient message overlay used for validation and short notices
+function showShortMessage(text, ms, cb){
+  const id = 'quizShortMsg';
+  if (qs('#'+id)) return;
+  const ov = document.createElement('div'); ov.id = id; ov.className='shortMsgOverlay';
+  ov.innerHTML = `<div class="shortMsgContent"><div class="stars">✶ ✦ ✶</div><div class="msg">${text}</div></div>`;
+  document.body.appendChild(ov);
+  setTimeout(()=>{ ov.classList.add('visible'); }, 20);
+  setTimeout(()=>{ ov.classList.remove('visible'); setTimeout(()=>{ try{ ov.remove(); }catch(e){} if(cb) cb(); },300); }, ms || 1400);
 }
